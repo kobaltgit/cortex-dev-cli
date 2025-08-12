@@ -14,8 +14,9 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
+    # --- ИЗМЕНЕНИЕ №1 ---
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4 # <-- Было v3
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -30,18 +31,16 @@ jobs:
     - name: Build executable with PyInstaller
       run: |
         if [ $RUNNER_OS == "Windows" ]; then
-          # Для Windows используем --onefile и --icon
           pyinstaller --onefile --name "CortexDevAnalyzer" --icon "icon.ico" cortex-dev-analyzer.py
         elif [ $RUNNER_OS == "macOS" ]; then
-          # Для macOS убираем --onefile и добавляем --windowed для создания .app бандла
           pyinstaller --windowed --name "CortexDevAnalyzer" --icon "icon.icns" cortex-dev-analyzer.py
         else
-          # Для Linux --onefile остается лучшим вариантом
           pyinstaller --onefile --name "CortexDevAnalyzer" cortex-dev-analyzer.py
         fi
 
+    # --- ИЗМЕНЕНИЕ №2 ---
     - name: Upload artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4 # <-- Было v3
       with:
         name: CortexDevAnalyzer-${{ runner.os }}
         path: dist/*
