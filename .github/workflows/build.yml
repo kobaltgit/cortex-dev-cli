@@ -8,8 +8,7 @@ on:
 jobs:
   build:
     strategy:
-      # --- ДОБАВЛЕНО ИЗМЕНЕНИЕ ---
-      fail-fast: false # Не отменять другие сборки, если одна упала
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
 
@@ -39,8 +38,28 @@ jobs:
           pyinstaller --onefile --name "CortexDevAnalyzer" cortex-dev-analyzer.py
         fi
 
+    # --- НАЧАЛО ИЗМЕНЕНИЙ ---
+    - name: Prepare Artifact for Upload
+      shell: bash
+      run: |
+        # Создаем папку для артефактов
+        mkdir artifact
+        
+        # Перемещаем нужные файлы в папку артефактов
+        if [ $RUNNER_OS == "Windows" ]; then
+          mv dist/CortexDevAnalyzer.exe artifact/
+        elif [ $RUNNER_OS == "macOS" ]; then
+          # Для macOS перемещаем весь бандл .app
+          mv dist/CortexDevAnalyzer.app artifact/
+        else
+          # Для Linux перемещаем исполняемый файл
+          mv dist/CortexDevAnalyzer artifact/
+        fi
+
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: CortexDevAnalyzer-${{ runner.os }}
-        path: dist/*
+        # Указываем путь к нашей новой папке с очищенными файлами
+        path: artifact/
+    # --- КОНЕЦ ИЗМЕНЕНИЙ ---
