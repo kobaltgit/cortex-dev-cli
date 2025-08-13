@@ -45,6 +45,12 @@ BINARY_FILE_EXTENSIONS = {
 }
 OUTPUT_FILENAME = "cortex-snapshot.json"
 
+FORCE_TEXT_FILE_EXTENSIONS = {
+    '.json', '.yaml', '.yml', '.md', '.txt', '.log', '.xml', '.ini', '.cfg', '.conf',
+    '.py', '.js', '.jsx', '.ts', '.tsx', '.html', '.css', '.scss', '.less',
+    '.java', '.cs', '.c', '.cpp', '.h', '.hpp', '.go', '.rb', '.rs', '.sh',
+    '.vue', '.svelte', '.toml', '.env'
+}
 
 # --- НАЧАЛО ИЗМЕНЕНИЙ: Новая функция для вывода сообщений ---
 def show_message_and_exit(title: str, message: str, is_error: bool = False):
@@ -74,8 +80,17 @@ def show_message_and_exit(title: str, message: str, is_error: bool = False):
 def is_text_file(file_path: Path) -> bool:
     """
     Определяет, является ли файл текстовым.
+    Если расширение файла явно указано как текстовое, считаем его текстовым
+    без дальнейших проверок на NULL-байты.
     """
-    if file_path.suffix.lower() in BINARY_FILE_EXTENSIONS:
+    file_ext = file_path.suffix.lower()
+
+    # НАЧАЛО ИЗМЕНЕНИЙ
+    if file_ext in FORCE_TEXT_FILE_EXTENSIONS:
+        return True
+    # КОНЕЦ ИЗМЕНЕНИЙ
+
+    if file_ext in BINARY_FILE_EXTENSIONS:
         return False
     try:
         with open(file_path, 'rb') as f:
