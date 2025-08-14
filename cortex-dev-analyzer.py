@@ -122,6 +122,8 @@ def analyze_directory(root_path: Path) -> tuple[list, dict]:
 
             file_path = current_path / filename
             relative_path_str = str(file_path.relative_to(root_path))
+
+            relative_path_str = relative_path_str.replace(os.sep, '/')
             
             all_file_paths.append(relative_path_str)
 
